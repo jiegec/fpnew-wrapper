@@ -15,7 +15,7 @@ class FPNewUnitTest extends ChiselFlatSpec {
         "--backend-name",
         "verilator"
       ),
-      () => new FPNew(flen = 64)
+      () => new FPNew(new FPConfig(flen = 64))
     ) { c =>
       new FPNewTester(c)
     } should be(true)
