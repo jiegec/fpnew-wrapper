@@ -12,7 +12,8 @@ module FPNewBlackbox #(
     parameter ENABLE_INT16 = 0,
     parameter ENABLE_INT32 = 0,
     parameter ENABLE_INT64 = 0,
-    // fpu implementation: default
+    // fpu implementation
+    parameter PIPELINE_STAGES = 0,
     // tag type: logic array
     parameter TAG_WIDTH = 0,
     // Do not change, follow fp-new definition
@@ -57,8 +58,19 @@ module FPNewBlackbox #(
         IntFmtMask: (ENABLE_INT8 << 3) | (ENABLE_INT16 << 2) | (ENABLE_INT32 << 1) | (ENABLE_INT64 << 0)
     };
 
+    // only pipeline regs is customized
+    localparam fpnew_pkg::fpu_implementation_t Implementation = '{
+        PipeRegs:   '{default: PIPELINE_STAGES},
+        UnitTypes:  '{'{default: fpnew_pkg::PARALLEL}, // ADDMUL
+                    '{default: fpnew_pkg::MERGED},   // DIVSQRT
+                    '{default: fpnew_pkg::PARALLEL}, // NONCOMP
+                    '{default: fpnew_pkg::MERGED}},  // CONV
+        PipeConfig: fpnew_pkg::BEFORE
+    };
+
     fpnew_top #(
         .Features(Features),
+        .Implementation(Implementation),
         .TagType(TagType)
     ) inst (
         .clk_i(clk_i),

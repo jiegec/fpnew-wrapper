@@ -17,7 +17,8 @@ class FPNewBlackbox(
     enableInt16: Boolean = true,
     enableInt32: Boolean = true,
     enableInt64: Boolean = true,
-    tagWidth: Int = 0
+    tagWidth: Int = 0,
+    pipelineStages: Int = 0,
 ) extends BlackBox(
       Map(
         "FLEN" -> IntParam(flen),
@@ -32,7 +33,8 @@ class FPNewBlackbox(
         "ENABLE_INT16" -> IntParam(enableInt16.compare(false)),
         "ENABLE_INT32" -> IntParam(enableInt32.compare(false)),
         "ENABLE_INT64" -> IntParam(enableInt64.compare(false)),
-        "TAG_WIDTH" -> IntParam(tagWidth)
+        "TAG_WIDTH" -> IntParam(tagWidth),
+        "PIPELINE_STAGES" -> IntParam(pipelineStages)
       )
     )
     with HasBlackBoxResource {

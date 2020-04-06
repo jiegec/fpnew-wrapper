@@ -11,6 +11,7 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
     while (peek(c.in.ready) == 0) {
       step(1)
     }
+    poke(c.in.valid, false)
     while (peek(c.out.valid) == 0) {
       step(1)
     }
@@ -47,6 +48,11 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   poke(c.in.bits.dstFormat, FPFloatFormat.Fp32)
   // 14.0, 22.0
   waitAndExpect("h4160000041B00000")
+
+  // convert float to int
+  poke(c.in.bits.op, FPOp.F2I)
+  poke(c.in.bits.intFormat, FPIntFormat.Int32)
+  waitAndExpect("h0000000200000003")
 }
 
 class FPNewUnitTest extends ChiselFlatSpec {
@@ -60,9 +66,11 @@ class FPNewUnitTest extends ChiselFlatSpec {
         "--top-name",
         "FPNew",
         "--target-dir",
-        "test_run_dir"
+        "test_run_dir",
+        "--more-vcs-flags", // passed to verilator in fact
+        "-Wno-BLKANDNBLK" // required when pipelineStages > 0
       ),
-      () => new FPNew(new FPConfig(flen = 64))
+      () => new FPNew(new FPConfig(flen = 64, pipelineStages = 2))
     ) { c =>
       new FPNewTester(c)
     } should be(true)

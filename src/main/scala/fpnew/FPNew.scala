@@ -5,7 +5,11 @@ import chisel3.util.Cat
 import chisel3.util.Decoupled
 import chisel3.experimental.ChiselEnum
 
-class FPConfig(val flen: Int = 64, val tagWidth: Int = 1)
+class FPConfig(
+    val flen: Int = 64,
+    val tagWidth: Int = 1,
+    val pipelineStages: Int = 0
+)
 
 object FPFloatFormat extends ChiselEnum {
   val Fp32, Fp64, Fp16, Fp8, Fp16Alt = Value
@@ -24,6 +28,7 @@ object FPRoundMode extends ChiselEnum {
   val RNE, RTZ, RDN, RUP, RMM, DYN = Value
 }
 
+// For meanings of these fields, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
 class FPInput(val config: FPConfig) extends Bundle {
   val in1 = UInt(config.flen.W)
   val in2 = UInt(config.flen.W)
@@ -56,7 +61,13 @@ class FPNew(config: FPConfig) extends MultiIOModule {
   val flush = IO(Input(Bool()))
   val busy = IO(Output(Bool()))
 
-  val blackbox = Module(new FPNewBlackbox(flen = config.flen))
+  val blackbox = Module(
+    new FPNewBlackbox(
+      flen = config.flen,
+      tagWidth = config.tagWidth,
+      pipelineStages = config.pipelineStages
+    )
+  )
   blackbox.io.clk_i := clock
   blackbox.io.rst_ni := ~reset.asBool()
   blackbox.io.operands_i := Cat(in.bits.in3, in.bits.in2, in.bits.in1)
