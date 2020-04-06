@@ -1,4 +1,5 @@
 project/
 .metals/
 .bloop/
-target
+target/
+test_run_dir/

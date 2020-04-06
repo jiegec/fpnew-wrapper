@@ -1,6 +1,6 @@
 module FPNewBlackbox #(
     // fpu features
-    parameter FLEN = 0,
+    parameter FLEN = 64,
     parameter ENABLE_VECTORS = 0,
     parameter ENABLE_NAN_BOX = 0,
     parameter ENABLE_FP32 = 0,
@@ -18,7 +18,7 @@ module FPNewBlackbox #(
     // Do not change, follow fp-new definition
     localparam int unsigned WIDTH        = FLEN,
     localparam int unsigned NUM_OPERANDS = 3,
-    localparam type TagType = logic [TAG_WIDTH:0]
+    localparam type TagType = logic [TAG_WIDTH-1:0]
 
 ) (
     // Copied from fpnew_top
@@ -54,7 +54,7 @@ module FPNewBlackbox #(
         EnableVectors: ENABLE_VECTORS,
         EnableNanBox: ENABLE_NAN_BOX,
         FpFmtMask: (ENABLE_FP32 << 4) | (ENABLE_FP64 << 3) | (ENABLE_FP16 << 2) | (ENABLE_FP8 << 1) | (ENABLE_FP16ALT << 0),
-        IntFmtMaskL (ENABLE_INT8 << 3) | (ENABLE_INT16 << 2) | (ENABLE_INT32 << 1) | (ENABLE_INT64 << 0)
+        IntFmtMask: (ENABLE_INT8 << 3) | (ENABLE_INT16 << 2) | (ENABLE_INT32 << 1) | (ENABLE_INT64 << 0)
     };
 
     fpnew_top #(
