@@ -18,7 +18,15 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   poke(c.in.bits.tag, 1)
   poke(c.in.valid, true)
   poke(c.out.ready, true)
-  step(100)
+  while (peek(c.in.ready) == 0) {
+    step(1)
+  }
+  poke(c.in.valid, 0)
+  while (peek(c.out.valid) == 0) {
+    step(1)
+  }
+  // 10.0
+  expect(c.out.bits.out, "hFFFFFFFF41200000".U)
 }
 
 class FPNewUnitTest extends ChiselFlatSpec {
