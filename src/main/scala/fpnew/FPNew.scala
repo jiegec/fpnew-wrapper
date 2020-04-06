@@ -13,3 +13,7 @@ class FPNew(flen: Int) extends MultiIOModule {
   blackbox.io.rst_ni := ~reset.asBool()
   blackbox.io.operands_i := Cat(in1, in2, in3)
 }
+
+object FPNewMain extends App {
+  chisel3.Driver.execute(args, () => new FPNew(flen = 64))
+}

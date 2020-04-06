@@ -3,3 +3,8 @@ project/
 .bloop/
 target/
 test_run_dir/
+*.anno.json
+*.fir
+FPNew.v
+firrtl_black_box_resource_files.f
+FPNewBlackbox.preprocessed.sv
