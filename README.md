@@ -1,6 +1,6 @@
 # FPnew Wrapper
 
-A chisel3 wrapper for pulp-platform/fpnew. Use the same method how ucb-bar/ariane-wrapper wraps Ariane.
+A chisel3 wrapper for [pulp-platform/fpnew](https://github.com/pulp-platform/fpnew). Use the same method how ucb-bar/ariane-wrapper wraps Ariane.
 
 ## Installation
 
@@ -11,4 +11,4 @@ You can either:
 
 ## License
 
-See `LICENSE`.
+See `LICENSE`. This project wraps code from [pulp-platform/fpnew](https://github.com/pulp-platform/fpnew) which is licensed under SolderPad Hardware License.
