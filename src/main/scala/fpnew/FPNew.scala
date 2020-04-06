@@ -59,7 +59,7 @@ class FPNew(config: FPConfig) extends MultiIOModule {
   val blackbox = Module(new FPNewBlackbox(flen = config.flen))
   blackbox.io.clk_i := clock
   blackbox.io.rst_ni := ~reset.asBool()
-  blackbox.io.operands_i := Cat(in.bits.in1, in.bits.in2, in.bits.in3)
+  blackbox.io.operands_i := Cat(in.bits.in3, in.bits.in2, in.bits.in1)
   blackbox.io.rnd_mode_i := in.bits.roundMode.asUInt()
   blackbox.io.op_i := in.bits.op.asUInt()
   blackbox.io.op_mod_i := in.bits.opModifier
