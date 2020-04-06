@@ -1,4 +1,12 @@
-VSRCS = fpnew/src/common_cells/src/rr_arb_tree.sv
+VSRCS = fpnew/src/common_cells/src/rr_arb_tree.sv \
+		fpnew/src/common_cells/src/lzc.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/defs_div_sqrt_mvp.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/control_mvp.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/div_sqrt_top_mvp.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/iteration_div_sqrt_mvp.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/norm_div_sqrt_mvp.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/nrbd_nrsc_mvp.sv \
+		fpnew/src/fpu_div_sqrt_mvp/hdl/preprocess_mvp.sv
 VSRCS += fpnew/src/fpnew_pkg.sv \
 		fpnew/src/fpnew_cast_multi.sv \
 		fpnew/src/fpnew_classifier.sv \

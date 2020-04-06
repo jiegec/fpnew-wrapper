@@ -21,7 +21,18 @@ class FPNewBlackbox(
 ) extends BlackBox(
       Map(
         "FLEN" -> IntParam(flen),
-        "ENABLE_VECTORS" -> IntParam(enableVectors.compare(false))
+        "ENABLE_VECTORS" -> IntParam(enableVectors.compare(false)),
+        "ENABLE_NAN_BOX" -> IntParam(enableNanBox.compare(false)),
+        "ENABLE_FP32" -> IntParam(enableFP32.compare(false)),
+        "ENABLE_FP64" -> IntParam(enableFP64.compare(false)),
+        "ENABLE_FP16" -> IntParam(enableFP16.compare(false)),
+        "ENABLE_FP8" -> IntParam(enableFP8.compare(false)),
+        "ENABLE_FP16ALT" -> IntParam(enableFP16Alt.compare(false)),
+        "ENABLE_INT8" -> IntParam(enableInt8.compare(false)),
+        "ENABLE_INT16" -> IntParam(enableInt16.compare(false)),
+        "ENABLE_INT32" -> IntParam(enableInt32.compare(false)),
+        "ENABLE_INT64" -> IntParam(enableInt64.compare(false)),
+        "TAG_WIDTH" -> IntParam(tagWidth)
       )
     )
     with HasBlackBoxResource {
