@@ -70,7 +70,7 @@ class FPNewUnitTest extends ChiselFlatSpec {
         "--more-vcs-flags", // passed to verilator in fact
         "-Wno-BLKANDNBLK" // required when pipelineStages > 0
       ),
-      () => new FPNew(new FPConfig(fLen = 64, pipelineStages = 2))
+      () => new FPNew()(new FPConfig(fLen = 64, pipelineStages = 2))
     ) { c =>
       new FPNewTester(c)
     } should be(true)

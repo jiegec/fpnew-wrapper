@@ -27,9 +27,8 @@ object FPRoundingMode extends ChiselEnum {
   val RNE, RTZ, RDN, RUP, RMM, DYN = Value
 }
 
-
 // For meanings of these fields, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
-class FPRequest(implicit config: FPConfig) extends Bundle {
+class FPRequest(implicit val config: FPConfig) extends Bundle {
   val operands = Vec(3, UInt(config.fLen.W))
   val roundingMode = FPRoundingMode()
   val op = FPOp()

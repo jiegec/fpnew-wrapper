@@ -18,7 +18,7 @@ class FPNewBlackbox(
     enableInt32: Boolean = true,
     enableInt64: Boolean = true,
     tagWidth: Int = 0,
-    pipelineStages: Int = 0,
+    pipelineStages: Int = 0
 ) extends BlackBox(
       Map(
         "FLEN" -> IntParam(flen),
