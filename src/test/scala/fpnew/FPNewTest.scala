@@ -15,7 +15,7 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
     while (peek(c.io.resp.valid) == 0) {
       step(1)
     }
-    expect(c.io.resp.bits.out, num.U)
+    expect(c.io.resp.bits.result, num.U)
     poke(c.io.resp.ready, false)
     poke(c.io.req.valid, false)
   }
@@ -50,8 +50,8 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   waitAndExpect("h4160000041B00000")
 
   // convert float to int
-  poke(c.in.bits.op, FPOp.F2I)
-  poke(c.in.bits.intFormat, FPIntFormat.Int32)
+  poke(c.io.req.bits.op, FPOp.F2I)
+  poke(c.io.req.bits.intFormat, FPIntFormat.Int32)
   waitAndExpect("h0000000200000003")
 }
 

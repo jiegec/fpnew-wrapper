@@ -2,6 +2,8 @@
 
 A chisel3 wrapper for [pulp-platform/fpnew](https://github.com/pulp-platform/fpnew). Use the same method how ucb-bar/ariane-wrapper wraps Ariane.
 
+This project uses verilator to preprocess fpnew sources to get rid of compiler derivatives to create a self contained verilog file.
+
 ## Installation
 
 You can either:

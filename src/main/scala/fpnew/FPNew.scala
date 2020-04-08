@@ -3,6 +3,7 @@ package fpnew
 import chisel3._
 import chisel3.util.Decoupled
 import chisel3.experimental.ChiselEnum
+import chisel3.util.Cat
 
 class FPConfig(
     val fLen: Int = 64,
@@ -29,7 +30,7 @@ object FPRoundingMode extends ChiselEnum {
 
 
 // For meanings of these fields, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
-class FPRequest(config: FPConfig) extends Bundle {
+class FPRequest(val config: FPConfig) extends Bundle {
   val operands = Vec(3, UInt(config.fLen.W))
   val roundingMode = FPRoundingMode()
   val op = FPOp()
@@ -41,7 +42,7 @@ class FPRequest(config: FPConfig) extends Bundle {
   val tag = UInt(config.tagWidth.W)
 }
 
-class FPResponse(config: FPConfig) extends Bundle {
+class FPResponse(val config: FPConfig) extends Bundle {
   val result = UInt(config.fLen.W)
   val status = new Bundle {
     val nz = Bool() // Invalid
@@ -53,7 +54,7 @@ class FPResponse(config: FPConfig) extends Bundle {
   val tag = UInt(config.tagWidth.W)
 }
 
-class FPNew(config: FPConfig) extends MultiIOModule {
+class FPNew(config: FPConfig) extends Module {
 
   val io = IO(new Bundle {
     val req = Flipped(Decoupled(new FPRequest(config)))
@@ -64,7 +65,7 @@ class FPNew(config: FPConfig) extends MultiIOModule {
 
   private val blackbox = Module(
     new FPNewBlackbox(
-      flen = config.flen,
+      flen = config.fLen,
       tagWidth = config.tagWidth,
       pipelineStages = config.pipelineStages
     )
@@ -74,7 +75,7 @@ class FPNew(config: FPConfig) extends MultiIOModule {
   blackbox.io.clk_i := clock
   blackbox.io.rst_ni := ~reset.asBool()
   // request
-  blackbox.io.operands_i := io.req.bits.operands
+  blackbox.io.operands_i := Cat(io.req.bits.operands(2), io.req.bits.operands(1), io.req.bits.operands(0))
   blackbox.io.rnd_mode_i := io.req.bits.roundingMode.asUInt()
   blackbox.io.op_i := io.req.bits.op.asUInt()
   blackbox.io.op_mod_i := io.req.bits.opModifier
