@@ -5,47 +5,47 @@ import chisel3.iotesters._
 
 class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   def waitAndExpect(num: String) {
-    poke(c.in.valid, true)
-    poke(c.out.ready, true)
+    poke(c.io.req.valid, true)
+    poke(c.io.resp.ready, true)
     step(1)
-    while (peek(c.in.ready) == 0) {
+    while (peek(c.io.req.ready) == 0) {
       step(1)
     }
-    poke(c.in.valid, false)
-    while (peek(c.out.valid) == 0) {
+    poke(c.io.req.valid, false)
+    while (peek(c.io.resp.valid) == 0) {
       step(1)
     }
-    expect(c.out.bits.out, num.U)
-    poke(c.out.ready, false)
-    poke(c.in.valid, false)
+    expect(c.io.resp.bits.out, num.U)
+    poke(c.io.resp.ready, false)
+    poke(c.io.req.valid, false)
   }
 
   // 2 * 3 + 4 = 10
   // NaN-boxed
   // 2.0
-  poke(c.in.bits.in1, "hFFFFFFFF40000000".U)
+  poke(c.io.req.bits.operands(0), "hFFFFFFFF40000000".U)
   // 3.0
-  poke(c.in.bits.in2, "hFFFFFFFF40400000".U)
+  poke(c.io.req.bits.operands(1), "hFFFFFFFF40400000".U)
   // 4.0
-  poke(c.in.bits.in3, "hFFFFFFFF40800000".U)
-  poke(c.in.bits.op, FPOp.FMADD)
-  poke(c.in.bits.srcFormat, FPFloatFormat.Fp32)
-  poke(c.in.bits.dstFormat, FPFloatFormat.Fp32)
-  poke(c.in.bits.tag, 1)
+  poke(c.io.req.bits.operands(2), "hFFFFFFFF40800000".U)
+  poke(c.io.req.bits.op, FPOp.FMADD)
+  poke(c.io.req.bits.srcFormat, FPFloatFormat.Fp32)
+  poke(c.io.req.bits.dstFormat, FPFloatFormat.Fp32)
+  poke(c.io.req.bits.tag, 1)
   // 10.0
   waitAndExpect("hFFFFFFFF41200000")
 
   // packed 2 fp32
   // 2.0, 3.0
-  poke(c.in.bits.in1, "h4000000040400000".U)
+  poke(c.io.req.bits.operands(0), "h4000000040400000".U)
   // 4.0, 5.0
-  poke(c.in.bits.in2, "h4080000040A00000".U)
+  poke(c.io.req.bits.operands(1), "h4080000040A00000".U)
   // 6.0, 7.0
-  poke(c.in.bits.in3, "h40C0000040E00000".U)
-  poke(c.in.bits.op, FPOp.FMADD)
-  poke(c.in.bits.vectorial, true)
-  poke(c.in.bits.srcFormat, FPFloatFormat.Fp32)
-  poke(c.in.bits.dstFormat, FPFloatFormat.Fp32)
+  poke(c.io.req.bits.operands(2), "h40C0000040E00000".U)
+  poke(c.io.req.bits.op, FPOp.FMADD)
+  poke(c.io.req.bits.vectorialOp, true)
+  poke(c.io.req.bits.srcFormat, FPFloatFormat.Fp32)
+  poke(c.io.req.bits.dstFormat, FPFloatFormat.Fp32)
   // 14.0, 22.0
   waitAndExpect("h4160000041B00000")
 
@@ -70,7 +70,7 @@ class FPNewUnitTest extends ChiselFlatSpec {
         "--more-vcs-flags", // passed to verilator in fact
         "-Wno-BLKANDNBLK" // required when pipelineStages > 0
       ),
-      () => new FPNew(new FPConfig(flen = 64, pipelineStages = 2))
+      () => new FPNew(new FPConfig(fLen = 64, pipelineStages = 2))
     ) { c =>
       new FPNewTester(c)
     } should be(true)

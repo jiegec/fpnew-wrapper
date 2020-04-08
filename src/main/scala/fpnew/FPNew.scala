@@ -1,12 +1,11 @@
 package fpnew
 
 import chisel3._
-import chisel3.util.Cat
 import chisel3.util.Decoupled
 import chisel3.experimental.ChiselEnum
 
 class FPConfig(
-    val flen: Int = 64,
+    val fLen: Int = 64,
     val tagWidth: Int = 1,
     val pipelineStages: Int = 0
 )
@@ -24,27 +23,26 @@ object FPOp extends ChiselEnum {
       I2F, CPKAB, CPKCD = Value
 }
 
-object FPRoundMode extends ChiselEnum {
+object FPRoundingMode extends ChiselEnum {
   val RNE, RTZ, RDN, RUP, RMM, DYN = Value
 }
 
+
 // For meanings of these fields, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
-class FPInput(val config: FPConfig) extends Bundle {
-  val in1 = UInt(config.flen.W)
-  val in2 = UInt(config.flen.W)
-  val in3 = UInt(config.flen.W)
-  val roundMode = FPRoundMode()
+class FPRequest(config: FPConfig) extends Bundle {
+  val operands = Vec(3, UInt(config.fLen.W))
+  val roundingMode = FPRoundingMode()
   val op = FPOp()
   val opModifier = Bool()
   val srcFormat = FPFloatFormat()
   val dstFormat = FPFloatFormat()
   val intFormat = FPIntFormat()
-  val vectorial = Bool()
+  val vectorialOp = Bool()
   val tag = UInt(config.tagWidth.W)
 }
 
-class FPOutput(val config: FPConfig) extends Bundle {
-  val out = UInt(config.flen.W)
+class FPResponse(config: FPConfig) extends Bundle {
+  val result = UInt(config.fLen.W)
   val status = new Bundle {
     val nz = Bool() // Invalid
     val dz = Bool() // Divide by zero
@@ -56,40 +54,48 @@ class FPOutput(val config: FPConfig) extends Bundle {
 }
 
 class FPNew(config: FPConfig) extends MultiIOModule {
-  val in = IO(Flipped(Decoupled(new FPInput(config))))
-  val out = IO(Decoupled(new FPOutput(config)))
-  val flush = IO(Input(Bool()))
-  val busy = IO(Output(Bool()))
 
-  val blackbox = Module(
+  val io = IO(new Bundle {
+    val req = Flipped(Decoupled(new FPRequest(config)))
+    val resp = Decoupled(new FPResponse(config))
+    val flush = Input(Bool())
+    val busy = Output(Bool())
+  })
+
+  private val blackbox = Module(
     new FPNewBlackbox(
       flen = config.flen,
       tagWidth = config.tagWidth,
       pipelineStages = config.pipelineStages
     )
   )
+
+  // clock & reset
   blackbox.io.clk_i := clock
   blackbox.io.rst_ni := ~reset.asBool()
-  blackbox.io.operands_i := Cat(in.bits.in3, in.bits.in2, in.bits.in1)
-  blackbox.io.rnd_mode_i := in.bits.roundMode.asUInt()
-  blackbox.io.op_i := in.bits.op.asUInt()
-  blackbox.io.op_mod_i := in.bits.opModifier
-  blackbox.io.src_fmt_i := in.bits.srcFormat.asUInt()
-  blackbox.io.dst_fmt_i := in.bits.dstFormat.asUInt()
-  blackbox.io.int_fmt_i := in.bits.intFormat.asUInt()
-  blackbox.io.vectorial_op_i := in.bits.vectorial
-  blackbox.io.tag_i := in.bits.tag
-  blackbox.io.in_valid_i := in.valid
-  in.ready := blackbox.io.in_ready_o
-  blackbox.io.flush_i := flush
-  out.bits.out := blackbox.io.result_o
-  out.bits.status := blackbox.io.status_o.asTypeOf(out.bits.status)
-  out.bits.tag := blackbox.io.tag_o
-  out.valid := blackbox.io.out_valid_o
-  blackbox.io.out_ready_i := out.ready
-  busy := blackbox.io.busy_o
+  // request
+  blackbox.io.operands_i := io.req.bits.operands
+  blackbox.io.rnd_mode_i := io.req.bits.roundingMode.asUInt()
+  blackbox.io.op_i := io.req.bits.op.asUInt()
+  blackbox.io.op_mod_i := io.req.bits.opModifier
+  blackbox.io.src_fmt_i := io.req.bits.srcFormat.asUInt()
+  blackbox.io.dst_fmt_i := io.req.bits.dstFormat.asUInt()
+  blackbox.io.int_fmt_i := io.req.bits.intFormat.asUInt()
+  blackbox.io.vectorial_op_i := io.req.bits.vectorialOp
+  blackbox.io.tag_i := io.req.bits.tag
+  blackbox.io.in_valid_i := io.req.valid
+  io.req.ready := blackbox.io.in_ready_o
+  // response
+  io.resp.bits.result := blackbox.io.result_o
+  io.resp.bits.status := blackbox.io.status_o.asTypeOf(io.resp.bits.status)
+  io.resp.bits.tag := blackbox.io.tag_o
+  io.resp.valid := blackbox.io.out_valid_o
+  blackbox.io.out_ready_i := io.resp.ready
+  // flush & flush
+  blackbox.io.flush_i := io.flush
+  io.busy := blackbox.io.busy_o
 }
 
 object FPNewMain extends App {
-  chisel3.Driver.execute(args, () => new FPNew(new FPConfig(flen = 64)))
+  chisel3.Driver.execute(args, () => new FPNew(new FPConfig(fLen = 64)))
 }
