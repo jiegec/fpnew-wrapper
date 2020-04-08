@@ -27,7 +27,6 @@ object FPRoundingMode extends ChiselEnum {
   val RNE, RTZ, RDN, RUP, RMM, DYN = Value
 }
 
-// For meanings of these fields, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
 class FPRequest(implicit val config: FPConfig) extends Bundle {
   val operands = Vec(3, UInt(config.fLen.W))
   val roundingMode = FPRoundingMode()
@@ -43,15 +42,19 @@ class FPRequest(implicit val config: FPConfig) extends Bundle {
 class FPResponse(implicit val config: FPConfig) extends Bundle {
   val result = UInt(config.fLen.W)
   val status = new Bundle {
-    val nz = Bool() // Invalid
-    val dz = Bool() // Divide by zero
-    val of = Bool() // Overflow
-    val uf = Bool() // Underflow
-    val nx = Bool() // Inexact
+    val NV = Bool() // Invalid
+    val DZ = Bool() // Divide by zero
+    val OF = Bool() // Overflow
+    val UF = Bool() // Underflow
+    val NX = Bool() // Inexact
   }
   val tag = UInt(config.tagWidth.W)
 }
 
+/**
+ * FPNew IO port.
+ * For meanings of ports, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
+ */
 class FPIO(implicit val config: FPConfig) extends Bundle {
   val req = Flipped(Decoupled(new FPRequest()))
   val resp = Decoupled(new FPResponse())
