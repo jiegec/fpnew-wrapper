@@ -3,7 +3,6 @@ package fpnew
 import chisel3._
 import chisel3.util.Decoupled
 import chisel3.experimental.ChiselEnum
-import chisel3.util.Cat
 
 class FPConfig(
     val fLen: Int = 64,
@@ -75,7 +74,7 @@ class FPNew(config: FPConfig) extends Module {
   blackbox.io.clk_i := clock
   blackbox.io.rst_ni := ~reset.asBool()
   // request
-  blackbox.io.operands_i := Cat(io.req.bits.operands(2), io.req.bits.operands(1), io.req.bits.operands(0))
+  blackbox.io.operands_i := io.req.bits.operands.asUInt()
   blackbox.io.rnd_mode_i := io.req.bits.roundingMode.asUInt()
   blackbox.io.op_i := io.req.bits.op.asUInt()
   blackbox.io.op_mod_i := io.req.bits.opModifier
