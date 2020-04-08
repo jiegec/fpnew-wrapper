@@ -18,7 +18,7 @@ object FPIntFormat extends ChiselEnum {
   val Int8, Int16, Int32, Int64 = Value
 }
 
-object FPOp extends ChiselEnum {
+object FPOperation extends ChiselEnum {
   val FMADD, FNMSUB, ADD, MUL, DIV, SQRT, SGNJ, MINMAX, CMP, CLASSIFY, F2F, F2I,
       I2F, CPKAB, CPKCD = Value
 }
@@ -30,7 +30,7 @@ object FPRoundingMode extends ChiselEnum {
 class FPRequest(implicit val config: FPConfig) extends Bundle {
   val operands = Vec(3, UInt(config.fLen.W))
   val roundingMode = FPRoundingMode()
-  val op = FPOp()
+  val op = FPOperation()
   val opModifier = Bool()
   val srcFormat = FPFloatFormat()
   val dstFormat = FPFloatFormat()
@@ -39,15 +39,17 @@ class FPRequest(implicit val config: FPConfig) extends Bundle {
   val tag = UInt(config.tagWidth.W)
 }
 
+class FPStatus extends Bundle {
+  val NV = Bool() // Invalid
+  val DZ = Bool() // Divide by zero
+  val OF = Bool() // Overflow
+  val UF = Bool() // Underflow
+  val NX = Bool() // Inexact
+}
+
 class FPResponse(implicit val config: FPConfig) extends Bundle {
   val result = UInt(config.fLen.W)
-  val status = new Bundle {
-    val NV = Bool() // Invalid
-    val DZ = Bool() // Divide by zero
-    val OF = Bool() // Overflow
-    val UF = Bool() // Underflow
-    val NX = Bool() // Inexact
-  }
+  val status = new FPStatus()
   val tag = UInt(config.tagWidth.W)
 }
 

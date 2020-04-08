@@ -28,7 +28,7 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   poke(c.io.req.bits.operands(1), "hFFFFFFFF40400000".U)
   // 4.0
   poke(c.io.req.bits.operands(2), "hFFFFFFFF40800000".U)
-  poke(c.io.req.bits.op, FPOp.FMADD)
+  poke(c.io.req.bits.op, FPOperation.FMADD)
   poke(c.io.req.bits.srcFormat, FPFloatFormat.Fp32)
   poke(c.io.req.bits.dstFormat, FPFloatFormat.Fp32)
   poke(c.io.req.bits.tag, 1)
@@ -42,7 +42,7 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   poke(c.io.req.bits.operands(1), "h4080000040A00000".U)
   // 6.0, 7.0
   poke(c.io.req.bits.operands(2), "h40C0000040E00000".U)
-  poke(c.io.req.bits.op, FPOp.FMADD)
+  poke(c.io.req.bits.op, FPOperation.FMADD)
   poke(c.io.req.bits.vectorialOp, true)
   poke(c.io.req.bits.srcFormat, FPFloatFormat.Fp32)
   poke(c.io.req.bits.dstFormat, FPFloatFormat.Fp32)
@@ -50,7 +50,7 @@ class FPNewTester(c: FPNew) extends PeekPokeTester(c) {
   waitAndExpect("h4160000041B00000")
 
   // convert float to int
-  poke(c.io.req.bits.op, FPOp.F2I)
+  poke(c.io.req.bits.op, FPOperation.F2I)
   poke(c.io.req.bits.intFormat, FPIntFormat.Int32)
   waitAndExpect("h0000000200000003")
 }
