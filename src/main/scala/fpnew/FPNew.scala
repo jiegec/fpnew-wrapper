@@ -29,7 +29,7 @@ object FPRoundingMode extends ChiselEnum {
 
 
 // For meanings of these fields, visit https://github.com/pulp-platform/fpnew/blob/develop/docs/README.md
-class FPRequest(val config: FPConfig) extends Bundle {
+class FPRequest(implicit config: FPConfig) extends Bundle {
   val operands = Vec(3, UInt(config.fLen.W))
   val roundingMode = FPRoundingMode()
   val op = FPOp()
@@ -41,7 +41,7 @@ class FPRequest(val config: FPConfig) extends Bundle {
   val tag = UInt(config.tagWidth.W)
 }
 
-class FPResponse(val config: FPConfig) extends Bundle {
+class FPResponse(implicit val config: FPConfig) extends Bundle {
   val result = UInt(config.fLen.W)
   val status = new Bundle {
     val nz = Bool() // Invalid
@@ -53,14 +53,16 @@ class FPResponse(val config: FPConfig) extends Bundle {
   val tag = UInt(config.tagWidth.W)
 }
 
-class FPNew(config: FPConfig) extends Module {
+class FPIO(implicit val config: FPConfig) extends Bundle {
+  val req = Flipped(Decoupled(new FPRequest()))
+  val resp = Decoupled(new FPResponse())
+  val flush = Input(Bool())
+  val busy = Output(Bool())
+}
 
-  val io = IO(new Bundle {
-    val req = Flipped(Decoupled(new FPRequest(config)))
-    val resp = Decoupled(new FPResponse(config))
-    val flush = Input(Bool())
-    val busy = Output(Bool())
-  })
+class FPNew(implicit val config: FPConfig) extends Module {
+
+  val io = IO(new FPIO())
 
   private val blackbox = Module(
     new FPNewBlackbox(
@@ -97,5 +99,6 @@ class FPNew(config: FPConfig) extends Module {
 }
 
 object FPNewMain extends App {
-  chisel3.Driver.execute(args, () => new FPNew(new FPConfig(fLen = 64)))
+  implicit private val config = new FPConfig(fLen = 64, pipelineStages = 2)
+  chisel3.Driver.execute(args, () => new FPNew())
 }
