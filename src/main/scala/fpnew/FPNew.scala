@@ -103,6 +103,12 @@ class FPNew(implicit val config: FPConfig) extends Module {
 }
 
 object FPNewMain extends App {
-  implicit private val config = new FPConfig(fLen = 64, pipelineStages = 2)
-  chisel3.Driver.execute(args, () => new FPNew())
+  chisel3.stage.ChiselMain.stage.execute(
+    args,
+    Seq(
+      chisel3.stage.ChiselGeneratorAnnotation(
+        () => new FPNew()(new FPConfig(fLen = 64, pipelineStages = 2))
+      )
+    )
+  )
 }
